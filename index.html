@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050a14">
+<title>Trung Thu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  color-scheme: dark;
+  --night-1:#020615; --night-2:#0a1630; --night-3:#160c1b;
+  --gold:#ffc56a; --gold-soft:#ffdca0; --gold-deep:#c98a35;
+  --paper-1:#fbf2dd; --paper-2:#f1ddae; --ink:#4a3216;
+  --ease: cubic-bezier(.2,.85,.3,1);
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{font-family:Mali,Georgia,serif;background:var(--night-1);-webkit-tap-highlight-color:transparent}
+button{font:inherit}
+
+.intro{
+  position:fixed;inset:0;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 20% 18%,rgba(70,96,150,.32),transparent 45%),
+    radial-gradient(ellipse at 78% 62%,rgba(48,70,120,.25),transparent 50%),
+    var(--night-1);
+  user-select:none;touch-action:none;
+}
+#scene{position:absolute;inset:0;width:100%;height:100%}
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 45%,rgba(0,0,0,.48) 100%)}
+
+/* ---- Mặt trăng chứa ảnh cá nhân ---- */
+.moon-wrap{
+  position:absolute;
+  top:calc(24px + env(safe-area-inset-top,0px));
+  right:calc(24px + env(safe-area-inset-right,0px));
+  width:min(160px,22vw,22vh);aspect-ratio:1;
+  cursor:pointer;z-index:28;
+  -webkit-user-select:none;
+  touch-action: none;
+  pointer-events:auto;
+}
+.moon-wrap:focus-visible{outline:2px solid var(--gold-soft);outline-offset:8px;border-radius:50%}
+.moon{
+  position:absolute;inset:0;width:100%;height:100%;border-radius:50%;
+  overflow: hidden;
+  transition:transform .3s var(--ease);
+}
+.moon img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  pointer-events: none;
+}
+.moon-wrap:hover .moon{transform:scale(1.06)}
+.moon-glow{position:absolute;inset:-12%;border-radius:50%;background:radial-gradient(circle,rgba(255,210,120,.4),rgba(255,180,70,.15) 40%,transparent 70%);animation:pulse 3s ease-in-out infinite}
+.moon-ring{position:absolute;inset:-22%;border-radius:50%;border:1px dashed rgba(255,215,150,.35);animation:spin 22s linear infinite;pointer-events:none}
+.moon-wrap::after{
+  content:"";position:absolute;inset:-4px;border-radius:50%;
+  box-shadow:0 0 0 1px rgba(255,230,180,.5), 0 0 24px rgba(255,190,100,.55);
+  pointer-events:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.moon-wrap.holding .moon {
+  transform: scale(0.92);
+}
+.moon-wrap.holding .moon-glow {
+  animation: none;
+  transform: scale(1.3);
+  background: radial-gradient(circle,rgba(255,230,150,.8),rgba(255,190,90,.4) 30%,transparent 50%);
+}
+
+/* ---- 2 Ảnh lơ lửng bên dưới ---- */
+.floating-photo {
+  position: absolute;
+  bottom: calc(8% + env(safe-area-inset-bottom, 0px));
+  z-index: 12;
+  width: min(130px, 26vw);
+  aspect-ratio: 4/5;
+  padding: 6px 6px 18px 6px;
+  border-radius: 10px;
+  background: linear-gradient(160deg,#fffaf0,#f0e2c4);
+  box-shadow: 0 14px 30px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.4) inset;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.5s ease;
+}
+.floating-photo.left {
+  left: 6vw;
+  animation: floatLeft 4s ease-in-out infinite alternate;
+}
+.floating-photo.right {
+  right: 6vw;
+  animation: floatRight 4.5s ease-in-out infinite alternate;
+}
+.floating-photo img {
+  width: 100%; height: 82%; object-fit: cover; border-radius: 6px; display: block;
+}
+
+@keyframes floatLeft {
+  0% { transform: translateY(0px) rotate(-5deg); }
+  100% { transform: translateY(-16px) rotate(3deg); }
+}
+@keyframes floatRight {
+  0% { transform: translateY(0px) rotate(6deg); }
+  100% { transform: translateY(-18px) rotate(-4deg); }
+}
+
+.hint{
+ position:absolute;left:50%;bottom:calc(5% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:18;color:#fff1d2;
+ font-size:clamp(14px,1.5vw,18px);letter-spacing:.02em;text-align:center;
+ text-shadow:0 0 8px rgba(255,190,100,.9),0 2px 4px #160603;
+ transition:opacity .35s ease;
+ display:flex;align-items:center;gap:8px;
+ padding:8px 18px;border-radius:999px;
+ background:rgba(10,8,20,.28);
+ border:1px solid rgba(255,215,160,.22);
+ backdrop-filter:blur(4px);
+ animation:hintFloat 2.6s ease-in-out infinite;
+ white-space:nowrap;
+}
+.hint-icon{font-size:1.05em;filter:drop-shadow(0 0 6px rgba(255,180,90,.7))}
+.hint.hidden{opacity:0;pointer-events:none}
+@keyframes hintFloat{50%{transform:translate(-50%,-4px)}}
+
+/* ---- Letter modal ---- */
+.letter-modal{
+  position:fixed;inset:0;z-index:30;display:none;place-items:center;
+  padding:20px; overflow-y: auto;
+}
+.letter-modal.open{display:grid}
+.modal-backdrop{position:absolute;inset:0;background:rgba(3,9,20,.62);backdrop-filter:blur(10px)}
+
+.letter-stage{
+  position:relative;
+  width:min(580px,92vw);
+  margin: auto;
+  display:flex;
+  flex-direction:column;
+}
+
+.letter-card{
+ position:relative; width:100%; max-height: 80vh;
+ border-radius:28px;
+ background:linear-gradient(160deg, var(--paper-1), var(--paper-2) 70%);
+ box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.55) inset, 0 0 40px rgba(255,190,100,.18);
+ padding:clamp(20px,4vw,32px) clamp(20px,4vw,36px) 70px;
+ animation:cardIn .65s var(--ease) both;
+ display:flex; flex-direction:column;
+ transition:opacity .3s ease, transform .3s ease;
+ outline:1px solid rgba(201,138,53,.25);
+ outline-offset:-8px;
+ border-radius:24px;
+}
+.letter-card.hidden{opacity:0;transform:scale(.94);pointer-events:none}
+.letter-ornament{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--gold-deep);margin-bottom:14px;flex:0 0 auto}
+.letter-ornament svg{width:16px;height:16px;flex:none;opacity:.8}
+.letter-ornament span{font-size:12px;letter-spacing:.22em;color:#a9793a;font-weight:700}
+
+.close{
+ position:absolute;z-index:30;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:0;
+ background:radial-gradient(circle at 50% 36%,#fdf5e2,#f6e8c9 60%,#ecd9b0);color:#8a5a1c;
+ font-size:22px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(86,56,18,.22);
+ display:grid;place-items:center;transition:transform .15s;
+}
+.close:hover{transform:scale(1.08)}
+
+.letter-content{
+ flex:1 1 auto; 
+ margin-bottom:15px;
+ overflow-y: auto;
+ max-height: 50vh;
+ padding-right: 8px;
+ -webkit-overflow-scrolling: touch;
+}
+.letter-content::-webkit-scrollbar {
+  width: 5px;
+}
+.letter-content::-webkit-scrollbar-thumb {
+  background: var(--gold-deep);
+  border-radius: 10px;
+}
+.letter-content::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+}
+
+.letter-content p{margin:0;color:var(--ink);font-weight:600;white-space:pre-wrap;overflow-wrap:anywhere;
+ font-size:clamp(15px,1.8vw,19px);line-height:1.65}
+.cursor{display:inline-block;width:2px;height:1.1em;background:#c98a35;margin-left:4px;vertical-align:-.15em;animation:blink .72s step-end infinite}
+
+.letter-rabbit {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  pointer-events: none;
+  animation: bob 4s ease-in-out infinite;
+}
+
+.heart{
+ position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:4;width:48px;height:48px;padding:0;
+ border:0;background:none;cursor:pointer;display:grid;place-items:center;
+}
+.heart svg{width:36px;height:36px;filter:drop-shadow(0 0 8px rgba(255,150,120,.75));animation:heart 3.2s ease-in-out infinite}
+.heart:hover svg{transform:scale(1.08)}
+
+@keyframes pulse{50%{transform:scale(1.08);opacity:.7}}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes blink{50%{opacity:0}}
+@keyframes bob{50%{transform:translateY(-6px)}}
+@keyframes heart{50%{transform:scale(1.1)}}
+
+.heart-particle{
+  position:fixed;z-index:40;pointer-events:none;font-size:18px;color:#ff8f7a;
+  will-change:transform,opacity;
+}
+
+@media(max-width:520px){
+ .moon-wrap{top:calc(18px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));width:min(110px,28vw,16vh)}
+ .floating-photo.left { left: 3vw; }
+ .floating-photo.right { right: 3vw; }
+ .floating-photo { width: 100px; }
+ .hint{bottom:calc(3% + env(safe-area-inset-bottom,0px));font-size:13px;width:90%}
+ .letter-card{padding:20px 16px 65px}
+ .letter-rabbit{width:50px;height:50px;right:10px;bottom:8px}
+}
+
+/* Nút Bật/Tắt nhạc ở góc trên bên trái */
+.music-toggle-fixed {
+  position: fixed;
+  top: calc(24px + env(safe-area-inset-top, 0px));
+  left: calc(24px + env(safe-area-inset-left, 0px));
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,220,160,.35);
+  background: radial-gradient(circle at 35% 30%, rgba(255,230,180,.18), rgba(20,14,8,.55));
+  backdrop-filter: blur(6px);
+  color: var(--gold-soft);
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255,255,255,.06);
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow .2s ease;
+}
+.music-toggle-fixed:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 18px rgba(255,190,100,.35), inset 0 0 0 1px rgba(255,255,255,.1);
+}
+.music-toggle-fixed:active {
+  transform: scale(0.95);
+}
+@media(max-width: 520px) {
+  .music-toggle-fixed {
+    top: calc(18px + env(safe-area-inset-top, 0px));
+    left: calc(14px + env(safe-area-inset-left, 0px));
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+</style>
+</head>
+<body>
+  <main id="intro" class="intro" aria-label="Thiệp Trung Thu">
+    <!-- Nút Bật/Tắt nhạc cố định bên trái ở trên -->
+    <button class="music-toggle-fixed" id="globalMusicBtn" aria-label="Bật/Tắt nhạc">🎵</button>
+
+    <canvas id="scene"></canvas>
+    <div class="vignette"></div>
+
+    <!-- 2 Ảnh lơ lửng phía dưới -->
+    <div class="floating-photo left">
+      <img id="swingImgLeft" src="" alt="Left Swing Image">
+    </div>
+
+    <div class="floating-photo right">
+      <img id="swingImgRight" src="" alt="Right Swing Image">
+    </div>
+
+    <!-- Mặt trăng ảnh cá nhân -->
+    <div class="moon-wrap" id="moonHit" tabindex="0" role="button" aria-label="Ấn và giữ ảnh để mở thiệp">
+      <div class="moon-glow"></div>
+      <div class="moon-ring"></div>
+      <div class="moon">
+        <img id="moonAvatar" src="" alt="Moon Avatar">
+      </div>
+    </div>
+
+    <div class="hint"><span class="hint-icon">🏮</span> Ấn và giữ vào khung ảnh để mở thiệp</div>
+  </main>
+
+  <section class="letter-modal" id="letterModal" aria-hidden="true">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="letter-stage">
+      
+      <!-- Nút Đóng -->
+      <button class="close" id="closeBtn" aria-label="Đóng">×</button>
+      
+      <div class="letter-card" id="letterCard" role="dialog" aria-modal="true" aria-label="Thư gửi bạn">
+        <div class="letter-ornament">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4.5"/></svg>
+          <span>TRUNG THU</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4.5"/></svg>
+        </div>
+        <div class="letter-content">
+          <p id="letterText"></p><span class="cursor"></span>
+        </div>
+        <img class="letter-rabbit" src="assets/3.webp" alt="Rabbit" />
+        <button class="heart" id="heartBtn" aria-label="Gửi yêu thương">
+          <svg viewBox="0 0 24 24"><path d="M12 21s-7.2-4.5-10-9C.3 8.7 1.6 4.8 5.2 3.9c2-.5 4 .2 5.2 1.9 1.2-1.7 3.2-2.4 5.2-1.9 3.6.9 4.9 4.8 3.2 8.1-2.8 4.5-10 9-10 9Z" fill="url(#hg)"/><defs><linearGradient id="hg" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#ffb199"/><stop offset="1" stop-color="#ff6f61"/></linearGradient></defs></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+<script>
+(() => {
+"use strict";
+
+const CONFIG = {
+  avatarUrl: "assets/trang.webp",
+  leftSwingImage: "assets/2.webp",
+  rightSwingImage: "assets/3.webp",
+  lanternImages: [
+    "assets/2.webp",
+    "assets/3.webp",
+    "assets/lantern.webp"
+  ],
+  //sử lời nhắn bay lên ở đây
+  flyingTexts: [
+    "Chào Bạn Của Tui Nha",
+    "Trung thu vui vẻ nha",
+  ],
+  //sửa lời nhắn trong thiệp
+  letter: `Gửi bạn,\n\nTrung thu năm nay lại về rồi 🌕 Ngoài kia đèn lồng đã treo kín phố, mùi bánh nướng thơm len qua từng con ngõ nhỏ.\nNăm nay đèn vẫn bay, trăng vẫn tròn, và mình thì không biết làm gì có ý nghĩ nên mình code cái web này 😁\nChúc cậu một mùa Trung thu thật bình yên ✨ Mong những điều dịu dàng nhất luôn tìm được đường đến với cậu.`
+};
+
+const bgMusic = new Audio("music.mp3");
+bgMusic.loop = true;
+
+const musicBtn = document.getElementById("globalMusicBtn");
+
+function updateMusicIcon() {
+  if (musicBtn) {
+    musicBtn.textContent = bgMusic.paused ? "🔇" : "🎵";
+  }
+}
+
+if (musicBtn) {
+  musicBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (bgMusic.paused) {
+      bgMusic.play().then(updateMusicIcon).catch(() => {});
+    } else {
+      bgMusic.pause();
+      updateMusicIcon();
+    }
+  });
+}
+
+bgMusic.addEventListener("play", updateMusicIcon);
+bgMusic.addEventListener("pause", updateMusicIcon);
+
+function startAudio() {
+  bgMusic.play().then(() => {
+    updateMusicIcon();
+    window.removeEventListener("click", startAudio);
+    window.removeEventListener("touchstart", startAudio);
+    window.removeEventListener("pointerdown", startAudio);
+  }).catch(() => {});
+}
+
+startAudio();
+
+window.addEventListener("click", startAudio);
+window.addEventListener("touchstart", startAudio);
+window.addEventListener("pointerdown", startAudio);
+
+document.getElementById("moonAvatar").src = CONFIG.avatarUrl;
+document.getElementById("swingImgLeft").src = CONFIG.leftSwingImage;
+document.getElementById("swingImgRight").src = CONFIG.rightSwingImage;
+
+const canvas = document.getElementById("scene");
+const ctx = canvas.getContext("2d");
+const moon = document.getElementById("moonHit");
+const modal = document.getElementById("letterModal");
+const textEl = document.getElementById("letterText");
+const closeBtn = document.getElementById("closeBtn");
+const backdrop = document.getElementById("modalBackdrop");
+const heartBtn = document.getElementById("heartBtn");
+const hint = document.querySelector(".hint");
+const letterCard = document.getElementById("letterCard");
+
+let W=0,H=0,dpr=1, raf=0, opened=false, holdTimer=0, typingTimer=0;
+let stars=[], lanterns=[], texts=[];
+let loadedLanternImgs = [];
+
+function preloadLanternImages() {
+  CONFIG.lanternImages.forEach(url => {
+    const img = new Image();
+    img.src = url;
+    loadedLanternImgs.push(img);
+  });
+}
+
+function rand(a,b){return a+Math.random()*(b-a)}
+
+function resize(){
+  const newW=innerWidth, newH=innerHeight;
+  dpr=Math.min(devicePixelRatio||1,2);
+  canvas.width=Math.floor(newW*dpr); canvas.height=Math.floor(newH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  if(W>0 && H>0 && stars.length && lanterns.length){
+    const sx=newW/W, sy=newH/H;
+    stars.forEach(s=>{s.x*=sx; s.y*=sy});
+    lanterns.forEach(l=>{l.x*=sx; l.y*=sy});
+    texts.forEach(o=>{o.x*=sx; o.y*=sy});
+  }
+  W=newW; H=newH;
+  if(!stars.length) makeStars();
+  if(!lanterns.length) makeLanterns();
+}
+
+function makeStars(){
+  const count=Math.min(900, Math.max(280, Math.floor(W*H/1800)));
+  stars=Array.from({length:count},()=>({x:rand(0,W),y:rand(0,H),r:rand(.3,1.45),a:rand(.25,1),p:rand(0,Math.PI*2),s:rand(.3,1.2)}));
+}
+
+function makeLanterns(){
+  const count=innerWidth<700?8:14;
+  lanterns=Array.from({length:count},()=>({
+    x:rand(-.05,1.05)*W,y:rand(.15,.95)*H,size:rand(28,45),
+    speed:rand(16,34),drift:rand(12,34),phase:rand(0,Math.PI*2),
+    imgIdx: Math.floor(Math.random() * CONFIG.lanternImages.length)
+  }));
+}
+
+function drawBackground(t){
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#020615"); g.addColorStop(.52,"#0a1630"); g.addColorStop(1,"#160c1b");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const rg=ctx.createRadialGradient(W*.72,H*.18,0,W*.72,H*.18,Math.max(W,H)*.65);
+  rg.addColorStop(0,"rgba(90,125,190,.18)");rg.addColorStop(1,"transparent");
+  ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  const gg=ctx.createRadialGradient(W*.5,H,0,W*.5,H,Math.max(W,H)*.6);
+  gg.addColorStop(0,"rgba(255,170,90,.10)");gg.addColorStop(1,"transparent");
+  ctx.fillStyle=gg;ctx.fillRect(0,0,W,H);
+  stars.forEach(s=>{
+    const a=s.a*(.55+.45*Math.sin(t*.001*s.s+s.p));
+    ctx.globalAlpha=a;ctx.fillStyle="#fff5d0";ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+function drawLanternImage(x, y, size, imgIdx) {
+  const img = loadedLanternImgs[imgIdx % loadedLanternImgs.length];
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = "rgba(255,180,100,0.6)";
+
+  if (img && img.complete) {
+    ctx.drawImage(img, -size / 2, -size / 2, size, size);
+  } else {
+    ctx.fillStyle = "#ffb14d";
+    ctx.fillRect(-size / 2, -size / 2, size, size);
+  }
+
+  ctx.restore();
+}
+
+function drawFlyingTexts(t, dt) {
+  ctx.save();
+  ctx.font = `600 ${Math.max(14, Math.min(20, W * 0.018))}px Mali, serif`;
+  ctx.textAlign = "center";
+  
+  texts.forEach((o) => {
+    o.y -= o.speed * (dt / 1000);
+    if (o.y < -50) {
+      o.text = CONFIG.flyingTexts[Math.floor(rand(0, CONFIG.flyingTexts.length))];
+      o.x = rand(.05, .95) * W;
+      o.y = H + rand(20, 80);
+      o.speed = rand(18, 28);
+    }
+    const flicker = .85 + .15 * Math.sin(t * .0012 + o.p);
+    ctx.globalAlpha = flicker;
+    
+    ctx.shadowColor = "#000000";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    
+    ctx.fillStyle = "#ffe4b3";
+    ctx.fillText(o.text, o.x, o.y);
+  });
+  ctx.restore();
+}
+
+function drawScene(t,dt){
+  drawBackground(t);
+  
+  lanterns.forEach(l=>{
+    l.y-=l.speed*dt/1000;
+    if(l.y<-90){
+      l.x=rand(-.05,1.05)*W; l.size=rand(28,45);
+      l.speed=rand(16,34); l.drift=rand(12,34); l.phase=rand(0,Math.PI*2);
+      l.y=H+rand(30,120);
+      l.imgIdx = Math.floor(Math.random() * CONFIG.lanternImages.length);
+    }
+    const x=l.x+Math.sin(t*.00035+l.phase)*l.drift;
+    drawLanternImage(x, l.y, l.size, l.imgIdx);
+  });
+
+  drawFlyingTexts(t, dt);
+}
+
+function initTexts(){
+  const count = 22; 
+  texts = [];
+  for(let i=0; i<count; i++){
+    texts.push({
+      text: CONFIG.flyingTexts[i % CONFIG.flyingTexts.length],
+      x: rand(.05, .95) * W,
+      y: (H / count) * i + rand(-30, 30),
+      p: rand(0, 6.28),
+      speed: rand(18, 28)
+    });
+  }
+}
+
+let lastT=0;
+function loop(t){
+  const dt = lastT ? Math.min(t-lastT, 48) : 16.6;
+  lastT=t;
+  drawScene(t,dt); raf=requestAnimationFrame(loop);
+}
+
+function openLetter(){
+  if(opened) return;
+  opened=true; clearTimeout(holdTimer);
+  moon.classList.remove("holding");
+  modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
+  typeLetter();
+}
+
+function typeLetter(){
+  clearTimeout(typingTimer); textEl.textContent="";
+  const letterContent = document.querySelector(".letter-content");
+  let i=0;
+  const step=()=>{ 
+    textEl.textContent=CONFIG.letter.slice(0,i++); 
+    if(letterContent) {
+      letterContent.scrollTop = letterContent.scrollHeight;
+    }
+    if(i<=CONFIG.letter.length) typingTimer=setTimeout(step,16); 
+  };
+  step();
+}
+
+function closeLetter(){
+  opened=false; clearTimeout(typingTimer); modal.classList.remove("open"); modal.setAttribute("aria-hidden","true");
+  letterCard.classList.remove("hidden");
+}
+
+/* CHỨC NĂNG ẤN VÀ GIỮ 1.2S */
+function startHold(e){
+  if(e.cancelable) e.preventDefault(); 
+  if(opened) return;
+  moon.classList.add("holding");
+  hint.classList.add("hidden");
+  clearTimeout(holdTimer); 
+  h
